@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Simple Music</string>
+    <string name="iconfont_back">&#xe8a4;</string>
+    <string name="iconfont_search">&#xe64c;</string>
+    <string name="iconfont_play">&#xe647;</string>
+    <string name="iconfont_pause">&#xe64b;</string>
+    <string name="iconfont_previous">&#xe64a;</string>
+    <string name="iconfont_next">&#xe648;</string>
+    <string name="iconfont_download">&#xe617;</string>
+    <string name="iconfont_more">&#xe546;</string>
+</resources>

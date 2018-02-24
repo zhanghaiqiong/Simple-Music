@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <TextView
+        android:id="@+id/notification_text_songName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Simple Music"
+        android:textColor="#000000"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/notification_text_singerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/notification_text_songName"
+        android:text="歌也不比酷狗少噢"
+        android:textColor="#424242"
+        android:textSize="14sp"/>
+
+    <ImageView
+        android:id="@+id/notification_skipNext"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_notification_skip_next" />
+
+    <ImageView
+        android:id="@+id/notification_play"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/notification_skipNext"
+        android:src="@drawable/ic_notification_play" />
+
+    <ImageView
+        android:id="@+id/notification_skipPrevious"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/notification_play"
+        android:src="@drawable/ic_notification_skip_previous" />
+
+</RelativeLayout>

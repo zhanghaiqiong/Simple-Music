@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_song_online_play"
+        android:title="播放"/>
+
+    <item
+        android:id="@+id/menu_song_online_collection"
+        android:title="收藏"/>
+
+    <item
+        android:id="@+id/menu_song_online_download"
+        android:title="下载"/>
+
+    <item
+        android:id="@+id/menu_song_online_info"
+        android:title="属性"/>
+
+    <item
+        android:id="@+id/menu_song_online_share"
+        android:title="分享"/>
+
+</menu>
