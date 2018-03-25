@@ -8,15 +8,20 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yanzhenjie.sofia.Bar;
 import com.yanzhenjie.sofia.Sofia;
 
-import cn.zhaiyifan.lyric.LyricUtils;
-import cn.zhaiyifan.lyric.widget.LyricView;
+import java.io.File;
+
+import me.wcy.lrcview.LrcUtils;
+import me.wcy.lrcview.LrcView;
 import me.yokeyword.fragmentation_swipeback.SwipeBackActivity;
 
 public class LyricsActivity extends SwipeBackActivity {
@@ -38,7 +43,11 @@ public class LyricsActivity extends SwipeBackActivity {
     private LocalReceiver localReceiver;
     private LocalBroadcastManager localBroadcastManager;
 
-    private LyricView lyricView;
+    public static LrcView lyricView;
+    private TextView tv_songName;
+    private TextView tv_singerName;
+
+    private String lyricsDir = Environment.getExternalStorageDirectory().getPath()+"/kgmusic/download/lyrics";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,16 +67,33 @@ public class LyricsActivity extends SwipeBackActivity {
         localReceiver=new LocalReceiver();
         localBroadcastManager.registerReceiver(localReceiver,intentFilter);
         //控件
+        tv_songName=findViewById(R.id.lyrics_layout_songName);
+        tv_singerName=findViewById(R.id.lyrics_layout_singerName);
         lyricView=findViewById(R.id.lyrics_layout_lyricView);
-        lyricView.setLyric(LyricUtils.parseLyric(getResources().openRawResource(R.raw.lyrics),"UTF-8"));
-        lyricView.setLyricIndex(0);
-        lyricView.play();
+        lyricView.setOnPlayClickListener(new LrcView.OnPlayClickListener() {
+            @Override
+            public boolean onPlayClick(long time) {
+                MainActivity.setPlaybackProgress(time);
+                return true;
+            }
+        });
+        //Log.d("shw",MainActivity.getPlayingSong().getFileHash());
+        //String path="/sdcard/kgmusic/download/lyrics/"+MainActivity.getPlayingSong().getFileName()+".lrc";
+        //lyricView.loadLrc(new File(path));
+        Song song=MainActivity.getPlayingSong();
+        tv_songName.setText(song.getSongName());
+        tv_singerName.setText(song.getSingerName());
+        //加载歌词
+        String lyricsPath = lyricsDir + "/" + song.getFileName() + ".lrc";
+        Log.d("shw",lyricsPath);
+        LyricsActivity.lyricView.loadLrc(new File(lyricsPath));
     }
     
     class LocalReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, "哈哈哈", Toast.LENGTH_SHORT).show();
+            tv_songName.setText(intent.getStringExtra("songName"));
+            tv_singerName.setText(intent.getStringExtra("singerName"));
         }
     }
 

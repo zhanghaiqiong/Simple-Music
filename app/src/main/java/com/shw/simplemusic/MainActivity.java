@@ -159,6 +159,14 @@ public class MainActivity extends SupportActivity {
         mediaPlayerBinder.playNewSong(songs, position);
     }
 
+    public static Song getPlayingSong(){
+        return mediaPlayerBinder.getPlayingSong();
+    }
+
+    public static void setPlaybackProgress(long position){
+        mediaPlayerBinder.setPlaybackProgress(position);
+    }
+
     @Override
     public void onBackPressedSupport() {
         //super.onBackPressedSupport();

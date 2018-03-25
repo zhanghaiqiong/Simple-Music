@@ -13,6 +13,7 @@ import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -21,6 +22,10 @@ import android.widget.RemoteViews;
 
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
@@ -28,6 +33,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class MediaPlayerService extends Service {
+
+    private String lyricsDir = Environment.getExternalStorageDirectory().getPath()+"/kgmusic/download/lyrics";
 
     private MediaPlayer mediaPlayer;
     private MediaPlayerBinder mediaPlayerBinder = new MediaPlayerBinder();
@@ -122,6 +129,9 @@ public class MediaPlayerService extends Service {
             try {
                 MainActivity.progressBar.setMax(mediaPlayer.getDuration());
                 MainActivity.progressBar.setProgress(mediaPlayer.getCurrentPosition());
+                if (LyricsActivity.lyricView!=null){
+                    LyricsActivity.lyricView.updateTime(mediaPlayer.getCurrentPosition());
+                }
                 //MainActivity.progressBar.setSecondaryProgress(bufferingProgress);
             } catch (Exception e) {
                 Log.d("shw", "更新进度条错误");
@@ -239,12 +249,16 @@ public class MediaPlayerService extends Service {
                     mediaPlayer.prepare();
                     startPlaying();
                 } else {
-                    AsyncTask asyncTask=new PlayOnlineMusicTask(song);
+                    AsyncTask asyncTask = new PlayOnlineMusicTask(song);
                     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR1) {
                         asyncTask.execute();
                     } else {
                         asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     }
+                }
+                String lyricsPath = lyricsDir + "/" + MainActivity.getPlayingSong().getFileName() + ".lrc";
+                if (LyricsActivity.lyricView!=null) {
+                    LyricsActivity.lyricView.loadLrc(new File(lyricsPath));
                 }
             } catch (Exception e) {
                 Log.d("shw", "error on play new song:" + e.toString());
@@ -268,13 +282,13 @@ public class MediaPlayerService extends Service {
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
                             //.url("http://m.kugou.com/app/i/getSongInfo.php?cmd=playInfo&hash=" + song.getFileHash() + "&from=mkugou")
-                            .url("http://www.kugou.com/yy/index.php?r=play/getdata&hash=" + song.getFileHash() + "&album_id="+song.getSongInfo().getString("AlbumID"))
+                            .url("http://www.kugou.com/yy/index.php?r=play/getdata&hash=" + song.getFileHash() + "&album_id=" + song.getSongInfo().getString("AlbumID"))
                             .build();
                     Response response = client.newCall(request).execute();
                     String responseData = response.body().string();
                     JSONObject jsonObject = new JSONObject(responseData).getJSONObject("data");
                     songUrl = jsonObject.getString("play_url");
-                    lyrics=jsonObject.getString("lyrics");
+                    lyrics = jsonObject.getString("lyrics");
                 } catch (Exception e) {
                     Log.d("shw", "error on play online music:" + e.toString());
                 }
@@ -284,19 +298,36 @@ public class MediaPlayerService extends Service {
             @Override
             protected void onPostExecute(Object o) {
                 try {
+                    //歌词
+                    String lyricsPath = lyricsDir + "/" + song.getFileName() + ".lrc";
+                    Log.d("shw",lyricsPath);
+                    File lrc = new File(lyricsPath);
+                    if (!lrc.exists()) {
+                        File file = new File(lyricsDir);
+                        if (!file.exists()) {
+                            file.mkdirs();
+                        }
+                        lrc.createNewFile();
+                    }
+                    try {
+                        BufferedWriter bfw = new BufferedWriter(new FileWriter(lrc, false));
+                        bfw.write(lyrics);
+                        bfw.newLine();
+                        bfw.flush();
+                        bfw.close();
+                    } catch (IOException e) {
+                        Log.d("shw","创建文件错误");
+                    }
+
                     try {
                         mediaPlayer.isPlaying();
                     } catch (IllegalStateException e) {
                         mediaPlayer = null;
                         newMediaPlayer();
                     }
-                    Log.d("shw","a");
                     mediaPlayer.setDataSource(songUrl);
-                    Log.d("shw","b");
                     mediaPlayer.prepare();
-                    Log.d("shw","c");
                     startPlaying();
-                    Log.d("shw","d");
                     //开启更新进度条任务
                 } catch (Exception e) {
                     Log.d("shw", "error on play online music 2 :" + e.toString());
@@ -356,6 +387,10 @@ public class MediaPlayerService extends Service {
         //获取播放进度
         public int getPlaybackProgress() {
             return mediaPlayer.getCurrentPosition();
+        }
+
+        public void setPlaybackProgress(long posotion){
+            mediaPlayer.seekTo((int)posotion);
         }
 
     }

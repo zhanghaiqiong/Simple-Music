@@ -34,7 +34,7 @@ public class Song {
     public Song(File songFile){
         this.songFile=songFile;
         this.songType=SONG_TYPE_LOCAL;
-        this.fileName=songFile.getName();
+        this.fileName=songFile.getName().replace("<em>", "").replace("</em>", "").substring(0,songFile.getName().lastIndexOf("."));
         this.fileHash=songFile.getPath();
         this.fileSize=String.valueOf(songFile.getTotalSpace());
 
@@ -47,7 +47,7 @@ public class Song {
         try {
             this.songInfo = songInfo;
             this.songType = SONG_TYPE_ONLINE;
-            this.fileName = songInfo.getString("FileName");
+            this.fileName = songInfo.getString("FileName").replace("<em>", "").replace("</em>", "");
             this.fileHash = songInfo.getString("FileHash");
             this.fileSize = songInfo.getString("FileSize");
 
